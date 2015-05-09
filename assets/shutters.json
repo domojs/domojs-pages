@@ -1,32 +1,14 @@
 [
     [
-        {"icon":"stop","cmd":"/api/device/Volets?cmd=stop1"},
-        {"icon":"up","cmd":"/api/device/Volets?cmd=up1"},
-        {"name":"Salle - Salon"},
-        {"icon":"down","cmd":"/api/device/Volets?cmd=down1"}
-    ],
-    [
-        {"icon":"stop","cmd":"/api/device/Volets?cmd=stop2"},
-        {"icon":"up","cmd":"/api/device/Volets?cmd=up2"},
+        {"icon":"stop","cmd":"/api/device/Volets RDC?cmd=stop"},
+        {"icon":"up","cmd":"/api/device/Volets RDC?cmd=up"},
         {"name":"Rez-de-chaussée"},
-        {"icon":"down","cmd":"/api/device/Volets?cmd=down2"}
+        {"icon":"down","cmd":"/api/device/Volets RDC?cmd=down"}
     ],
     [
-        {"icon":"stop","cmd":"/api/device/Volets?cmd=stop3"},
-        {"icon":"up","cmd":"/api/device/Volets?cmd=up3"},
-        {"name":"Sdb - Chambre d'amis"},
-        {"icon":"down","cmd":"/api/device/Volets?cmd=down3"}
-    ],
-    [
-        {"icon":"stop","cmd":"/api/device/Volets?cmd=stop4"},
-        {"icon":"up","cmd":"/api/device/Volets?cmd=up4"},
-        {"name":"Inconnu"},
-        {"icon":"down","cmd":"/api/device/Volets?cmd=down4"}
-    ],
-    [
-        {"icon":"stop","cmd":"/api/device/Volets?cmd=stop5"},
-        {"icon":"up","cmd":"/api/device/Volets?cmd=up5"},
+        {"icon":"stop","cmd":"/api/device/tous les volets?cmd=stop"},
+        {"icon":"up","cmd":"/api/device/tous les volets?cmd=up"},
         {"name":"Tous"},
-        {"icon":"down","cmd":"/api/device/Volets?cmd=down5"}
+        {"icon":"down","cmd":"/api/device/tous les volets?cmd=down"}
     ]
 ]
