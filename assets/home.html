@@ -1,0 +1,274 @@
+<div class="swipe-screen dock top left bottom right">
+    <div class="big">
+        <div class="legend darker dock bottom right left">
+            
+        </div>
+        <div class="weather current">
+            <img />
+            <span class="temp"></span>
+            <span class="wind"></span>
+            <span class="chance-of-rain"></span>
+        </div>
+        <ul class="weather">
+            <li class="forecast darker">
+                Aujourd'hui
+                <hr />
+                <img />
+                <span class="temp-min"></span>
+                <span class="temp-max"></span>
+                <span class="chance-of-rain"></span>
+            </li>
+            <li class="darker forecast-tomorrow">
+                Demain
+                <hr />
+                <img />
+                <span class="temp-min"></span>
+                <span class="temp-max"></span>
+                <span class="chance-of-rain"></span>
+            </li>
+        </ul>
+    
+        <div class="time dock top right">
+            
+        </div>
+        <div class="dock bottom left">
+            <span class="day">
+                
+            </span>
+            <span class="date">
+                
+            </span>
+        </div>
+        <ul class="agenda darker dock bottom right">
+            
+        </ul>
+    </div>
+    <table class="table">
+        <tr>
+            <td></td>
+        </tr>
+    </table>
+</div>
+<style>
+    .swipe-screen,.swipe-screen > *
+    {
+        cursor:none;
+        height:100%;
+        margin:0;
+        padding:0;
+        width:100%;
+    }
+    .swipe-screen
+    {
+        background-attachment:fixed;
+    }
+
+    ul.weather
+    {
+        list-style:none;
+    }
+    
+    ul.weather li
+    {
+        float:left;
+        width:300px;
+        height:400px;
+        margin-right:20px;
+        font-size:40pt;
+        padding-left:15px;
+        padding-right:15px;
+        text-align:center;
+    }
+
+    ul.weather li .temp-min,
+    ul.weather li .temp-max
+    {
+        width:100%;
+        display:block;
+    }
+
+    
+    ul.weather li svg
+    {
+        height:100px;
+        width:100%;
+    }
+    
+    ul.weather li .temp
+    {
+        line-height:40pt;
+    }
+
+    .darker
+    {
+        background-color:rgba(0,0,0,0.5);
+    }
+    
+    .legend
+    {
+        font-size:large;
+        text-align:right;
+    }
+
+    .agenda
+    {
+        height:70%;
+        width:500px;
+        margin-bottom:19pt;
+    }
+
+    #content
+    {
+        padding-top:0;
+    }
+    body > .navbar
+    {
+        display:none;
+    }
+    
+    .weather svg
+    {
+        height:300px;
+        width:300px;
+        
+    }
+    
+    .weather svg
+    {
+        float:left;
+    }
+    
+    .time
+    {
+        padding-right:20px;
+    }
+    
+    .day
+    {
+        margin-left:20px;
+    }
+    
+    .weather .temp, .time
+    {
+        line-height:300px;
+    }
+    
+    .weather svg path
+    {
+        fill:black;
+    }
+    
+    .dark .weather svg path
+    {
+        fill: white;
+    }
+    
+    .dark
+    {
+        color:white;
+    }
+    
+    .big
+    {
+        font-size:100pt;
+    }
+    
+    .time
+    {
+        margin-right:10px;
+    }
+    
+    .dock
+    {
+        position:absolute;
+    }
+    .dock.top
+    {
+        top:0;
+    }
+    .dock.left
+    {
+        left:0;
+    }
+    .dock.right
+    {
+        right:0;
+    }
+    .dock.bottom
+    {
+        bottom:0;
+    }
+</style>
+<script>
+
+    function updateWeather(){
+        $.get('/api/weather/get', function(data){
+            $('.weather.current .temp').text(data.current_observation.temp_c+'°C');
+            $.get('assets/weather/img/'+data.current_observation.icon+'.svg', function(data){
+                var $svg=$(data).find('svg');
+    
+                $('.weather.current img').replaceWith($svg);
+            }, 'xml');
+        });
+        $.get('/api/weather/forecast/0', function(data){
+            $('ul.weather .forecast .temp-min').text(data.low.celsius+'°C');
+            $('ul.weather .forecast .temp-max').text(data.high.celsius+'°C');
+            $.get('assets/weather/img/'+data.icon+'.svg', function(data){
+                var $svg=$(data).find('svg');
+    
+                $('ul.weather .forecast img').replaceWith($svg);
+            }, 'xml');
+        });
+        $.get('/api/weather/forecast/1', function(data){
+            $('ul.weather .forecast-tomorrow .temp-min').text(data.low.celsius+'°C');
+            $('ul.weather .forecast-tomorrow .temp-max').text(data.high.celsius+'°C');
+            $.get('assets/weather/img/'+data.icon+'.svg', function(data){
+                var $svg=$(data).find('svg');
+    
+                $('ul.weather .forecast-tomorrow img').replaceWith($svg);
+            }, 'xml');
+        });
+    }
+    
+    function updateBackdrop(){
+        var request=require('request');
+        request('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&pid=hp&video=0', function(error, data){
+            if(data)
+                data=JSON.parse(data.body);
+                
+            if(data && data.images)
+            {
+                $('.legend').text(data.images[0].copyright)
+                $('.swipe-screen').css('background-image', 'url("https://www.bing.com'+data.images[0].url+'")').toggleClass('dark', data.images[0].drk==1);
+            }
+        });
+    }
+    
+    function updateDateAndTime(){
+        $('.time').text(moment().format('LT'));
+        $('.day').text(moment().format('dddd'));
+        $('.date').text(moment().format('ll'));
+    }
+    
+    updateWeather();
+    
+    if(require)
+    {
+        var moment=require('moment');
+        moment.locale('fr');
+        var now=new Date();
+        updateDateAndTime();
+        updateBackdrop();
+        setTimeout(function(){
+            updateDateAndTime();
+            setInterval(function(){
+                var now=new Date();
+                updateDateAndTime();
+                if(now.getMinutes()%15==0)
+                    updateWeather();
+                if(now.getHours()==0 && now.getMinutes()==0)
+                    updateBackdrop();
+            }, 60000);
+        }, (60-now.getSeconds())*1000);
+    }
+</script>

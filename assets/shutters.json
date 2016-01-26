@@ -6,9 +6,9 @@
         {"icon":"down","cmd":"/api/device/Volets RDC?cmd=down"}
     ],
     [
-        {"icon":"stop","cmd":"/api/device/tous les volets?cmd=stop"},
-        {"icon":"up","cmd":"/api/device/tous les volets?cmd=up"},
+        {"icon":"stop","cmd":"/api/device/Tous?cmd=stop"},
+        {"icon":"up","cmd":"/api/device/Tous?cmd=up"},
         {"name":"Tous"},
-        {"icon":"down","cmd":"/api/device/tous les volets?cmd=down"}
+        {"icon":"down","cmd":"/api/device/Tous?cmd=down"}
     ]
 ]
