@@ -39,15 +39,14 @@
                 
             </span>
         </div>
-        <ul class="agenda darker dock bottom right">
+        <ul class="agenda darker dock bottom right media-list">
             
         </ul>
     </div>
-    <table class="table">
-        <tr>
-            <td></td>
-        </tr>
-    </table>
+    <div class="hours">
+        <table class="table table-striped">
+        </table>
+    </div>
 </div>
 <style>
     .swipe-screen,.swipe-screen > *
@@ -61,8 +60,9 @@
     .swipe-screen
     {
         background-attachment:fixed;
+        background-size:cover;
     }
-
+    
     ul.weather
     {
         list-style:none;
@@ -115,7 +115,35 @@
         height:70%;
         width:500px;
         margin-bottom:19pt;
+        font-size:14pt;
+        overflow:hidden;
     }
+    
+    .dark .agenda .list-group-item
+    {
+        background-color:rgba(255,255,255,.5);
+    }
+    
+    .dark .agenda .list-group-item-heading
+    {
+        color:white;
+        font-weight:bold;
+    }
+    
+    .agenda .list-group-item
+    {
+        background-color:rgba(0,0,0,.5);
+    }
+    
+    .agenda .list-group-item-heading
+    {
+        color:black;
+    }
+    
+    /*.agenda .list-group-item-text
+    {
+        display:none;
+    }*/
 
     #content
     {
@@ -124,6 +152,11 @@
     body > .navbar
     {
         display:none;
+    }
+    
+    body
+    {
+        overflow:hidden;
     }
     
     .weather svg
@@ -163,7 +196,7 @@
         fill: white;
     }
     
-    .dark
+    .dark .big
     {
         color:white;
     }
@@ -198,8 +231,266 @@
     {
         bottom:0;
     }
+    
+    .hours .table th,
+    .hours .table td
+    {
+        vertical-align:middle;
+        text-align:center;
+        color:black;
+        font-size:16pt;
+    }
+    
+    .swipe-screen .table > tbody > tr:nth-child(1) > :nth-child(1)
+    {
+        background-color:rgba(.8, 255,255,255);
+    }
+    
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(2)
+    {
+        background-color:#f2ffe6;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(3)
+    {
+        background-color:#ffe6ff;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(4)
+    {
+        background-color:#e6f2ff;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(5)
+    {
+        background-color:#ffe6ee;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(6)
+    {
+        background-color:#ebfaeb;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(7)
+    {
+        background-color:#e6f0ff;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(8)
+    {
+        background-color:#ffe6e6;
+    }
+    .swipe-screen .table:nth-child(1) > tbody > tr > :nth-child(9)
+    {
+        background-color:#ffffff;
+    }
+    
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(2)
+    {
+        background-color:#e6f0ff;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(3)
+    {
+        background-color:#ffffff;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(4)
+    {
+        background-color:#ffe6e6;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(5)
+    {
+        background-color:#f2ffe6;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(6)
+    {
+        background-color:#e6f2ff;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(7)
+    {
+        background-color:#ffe6ff;
+    }
+    .swipe-screen .table:nth-child(2) > tbody > tr > :nth-child(8)
+    {
+        background-color:#ebfaeb;
+    }
+    
+    .agenda .module > ul.dropdown-menu
+    {
+        display:block;
+        top:0px;
+        margin-top:10px;
+        margin-left:10px;
+        max-height:20px;
+        max-width:200px;
+        text-overflow:ellipsis;
+    }
+    
+    .agenda .module > ul.dropdown-menu > li
+    {
+        display:block;
+        top:0px;
+        margin-top:10px;
+        margin-left:10px;
+    }
+    
+    .agenda .module > a
+    {
+        margin-left:200px;
+    }
+    
+    .agenda > li
+    {
+        display:none;
+    }
+    
+    
+    
+    .agenda > li.user.module,
+    .agenda > li.media.module
+    {
+        display:none;
+    }
+    
+    .agenda > li.module,
+    .agenda > li.article
+    {
+        display:block;
+    }
+    
 </style>
+<script src="/assets/news/js/sugar.js"></script>
 <script>
+    var hours={
+            'Mairie Mulhouse':
+            {
+                'monday':['08h15 à 12h', '14h30 à 18h'],
+                'tuesday':['08h15 à 12h', '14h30 à 18h'],
+                'wednesday':['08h15 à 12h', '14h30 à 18h'],
+                'thursday':['08h15 à 12h', '14h30 à 18h'],
+                'friday':['08h15 à 12h', '14h30 à 18h'],
+                'saturday':['fermé']
+            },
+            'Dr Guth':
+            {
+                'monday':['08h30 à 11h', '16h à 18h'],
+                'tuesday':['08h30 à 11h', '16h à 18h'],
+                'wednesday':['10h à 17h'],
+                'friday':['08h30 à 11h', '16h à 18h'],
+            },
+            'Déchetterie':
+            {
+                'monday':['9h à 12h', '13h30 à 18h'],
+                'tuesday':['9h à 12h', '13h30 à 18h'],
+                'wednesday':['9h à 12h', '13h30 à 18h'],
+                'thursday':['9h à 12h', '13h30 à 18h'],
+                'friday':['9h à 12h', '13h30 à 18h'],
+                'saturday':['9h à 18h'],
+            },
+            'Brico dépot':
+            {
+                'monday':['7h à 19h30'],
+                'tuesday':['7h à 19h30'],
+                'wednesday':['7h à 19h30'],
+                'thursday':['7h à 19h30'],
+                'friday':['7h à 19h30'],
+                'saturday':['7h à 19h30'],
+            },
+            'Leroy Merlin':
+            {
+                'monday':['9h à 20h'],
+                'tuesday':['9h à 20h'],
+                'wednesday':['9h à 20h'],
+                'thursday':['9h à 20h'],
+                'friday':['9h à 20h'],
+                'saturday':['8h à 20h'],
+            },
+            'Carrefour':
+            {
+                'monday':['8h30 à 21h'],
+                'tuesday':['8h30 à 21h'],
+                'wednesday':['8h30 à 21h'],
+                'thursday':['8h30 à 21h'],
+                'friday':['8h30 à 21h'],
+                'saturday':['8h30 à 20h30'],
+            },
+            'E.Leclerc Cernay':
+            {
+                'monday':   ['8h30 à 20h'],
+                'tuesday':  ['8h30 à 20h'],
+                'wednesday':['8h30 à 20h'],
+                'thursday': ['8h30 à 20h'],
+                'friday':   ['8h30 à 21h'],
+                'saturday': ['8h30 à 20h'],
+            },
+            'Cora Dornach':
+            {
+                'monday':['8h30 à 20h30'],
+                'tuesday':['8h30 à 20h30'],
+                'wednesday':['8h30 à 20h30'],
+                'thursday':['8h30 à 20h30'],
+                'friday':['8h30 à 20h30'],
+                'saturday':['8h à 20h'],
+            },
+            'Lidl':
+            {
+                'monday':['8h30 à 19h'],
+                'tuesday':['8h30 à 19h'],
+                'wednesday':['8h30 à 19h'],
+                'thursday':['8h30 à 19h'],
+                'friday':['8h30 à 19h'],
+                'saturday':['8h30 à 19h'],
+            },
+            'Credit Mutuel - Porte Ouest':
+            {
+                'tuesday':['10h00 à 12h10', '14h05 à 17h30'],
+                'wednesday':['8h30 à 12h10', '14h05 à 17h30'],
+                'thursday':['8h30 à 12h10', '14h05 à 17h30'],
+                'friday':['8h30 à 12h10', '14h05 à 18h15'],
+                'saturday':['8h15 à 12h00'],
+            },
+        };
+    var days=['monday','tuesday','wednesday','thursday','friday','saturday']
+    var row=$('<tr><td></td></tr>');
+    $.each(Date.getLocale('fr').weekdays, function(i, day){
+        if(i>0 && i<7)
+            $('<th></th>').text(day).appendTo(row);
+    });
+    row.appendTo('.swipe-screen > div.hours > .table');
+    $.each(hours, function(name, hour)
+    {
+        row=$('<tr></tr>');
+        $('<th></th>').text(name).appendTo(row);
+        $.each(days, function(i, day){
+            var cell=$('<td></td>');
+            var content='';
+            if($.isArray(hour[day]))
+            {
+                $.each(hour[day], function(i, dayHours){
+                    if(i>0)
+                        content+='<br />';
+                    content+=dayHours;
+                });
+            }
+            else
+                content=hour[day];
+            cell.html(content);
+            cell.appendTo(row);
+        })
+        row.appendTo('.swipe-screen > div.hours > .table');
+    });
+
+    socket.on('message', function(message)
+    {
+        if(typeof(message)=='string')
+            message={text:message};
+        var messageDom=$('<li class="media"><div class="media-left"><img class="media-object" /></div><div class="media-body"><h5 class="media-heading"></h5><h4 class="media-description"></h4></div></li>');
+        messageDom.find('.media-heading').text(message.title || 'Notification');
+        messageDom.find('.media-description').text(message.text);
+        messageDom.find('.media-object').attr('src', message.icon);
+        
+        messageDom.appendTo('.agenda');
+        setTimeout(function(){
+            messageDom.hide('drop', function(){
+                messageDom.remove();
+            });
+        }, 10000);
+    });
+    
+    socket.emit('join', 'home');
 
     function updateWeather(){
         $.get('/api/weather/get', function(data){
@@ -231,44 +522,126 @@
     }
     
     function updateBackdrop(){
-        var request=require('request');
-        request('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&pid=hp&video=0', function(error, data){
-            if(data)
-                data=JSON.parse(data.body);
-                
-            if(data && data.images)
-            {
-                $('.legend').text(data.images[0].copyright)
-                $('.swipe-screen').css('background-image', 'url("https://www.bing.com'+data.images[0].url+'")').toggleClass('dark', data.images[0].drk==1);
-            }
-        });
+        if(typeof(require)!='undefined')
+        {
+            var request=require('request');
+            request('https://www.bing.com/HPImageArchive.aspx?format=js&idx=0&n=1&pid=hp&video=0', function(error, data){
+                if(data)
+                    data=JSON.parse(data.body);
+                    
+                if(data && data.images)
+                {
+                    $('.legend').text(data.images[0].copyright)
+                    $('.swipe-screen').css('background-image', 'url("https://www.bing.com'+data.images[0].url+'")').toggleClass('dark', data.images[0].drk==1);
+                }
+            });
+        }
     }
     
+    var active=0;
+
+    $(document).bindKey('F5', function(){
+        debugger;
+        socket.emit('refresh', 'home');
+    });
+    var scrollTo=function(element, callback)
+    {
+		var min = element.position().top + element.outerHeight();
+		var maxHeight = window.innerHeight;
+		var idealPosition = maxHeight / 2;
+		if (element.outerHeight() - idealPosition > 0)
+			element.parents().animate({scrollTop:min - element.outerHeight()}, {complete:callback});
+		else
+			element.parents().animate({scrollTop:element.position().top - idealPosition}, {complete:callback});
+    };
+    
+    setInterval(function(){
+        var newActive=(active+1) % $('.swipe-screen > *').length;
+        scrollTo($('.swipe-screen > :nth-child('+(newActive+1)+')'), function(){
+            if(active===newActive)
+                return;
+            active=newActive;
+            if(active==0)
+                loadMore(0);
+        });
+    }, 30000);
+    
     function updateDateAndTime(){
-        $('.time').text(moment().format('LT'));
-        $('.day').text(moment().format('dddd'));
-        $('.date').text(moment().format('ll'));
+        var now=new Date();
+        $('.big>.time').text(now.format('{HH}:{mm}'));
+        $('.big>.day').text(now.format('{weekday}'));
+        $('.big>.date').text(now.format('{d} {mon}. {yyyy}'));
+        $('.swipe-screen').removeClass('day-0 day-1 day-2 day-3 day-4 day-5 day-6').addClass('day-'+now.getDay());
     }
     
     updateWeather();
     
-    if(require)
-    {
-        var moment=require('moment');
-        moment.locale('fr');
-        var now=new Date();
+    Date.setLocale('fr');
+    var now=new Date();
+    updateBackdrop();
+    setTimeout(function(){
         updateDateAndTime();
-        updateBackdrop();
-        setTimeout(function(){
+        setInterval(function(){
+            var now=new Date();
             updateDateAndTime();
-            setInterval(function(){
-                var now=new Date();
-                updateDateAndTime();
-                if(now.getMinutes()%15==0)
-                    updateWeather();
-                if(now.getHours()==0 && now.getMinutes()==0)
-                    updateBackdrop();
-            }, 60000);
-        }, (60-now.getSeconds())*1000);
-    }
+            if(now.getMinutes()%15==0)
+                updateWeather();
+            if(now.getHours()==0 && now.getMinutes()==0)
+                updateBackdrop();
+        }, 60000);
+    }, (60-now.getSeconds())*1000);
+
+    debugger;
+    $('#modulePlaceHolder > li').addClass('list-group-item').appendTo('.agenda')
+
+    var loadMore=function(from)
+    {
+        if(typeof(from)=='undefined')
+        {
+            from=$('.agenda li').length-2;
+        }
+        debugger;
+        $.getJSON('/api/news/rss/unread?from='+from+'&tag=all&_='+Number(new Date()), function(articles){
+            if(from===0)
+            {
+                $('.agenda .article').remove();
+                $('<li class="list-group-item hidden active"></li>').appendTo('.agenda');
+            }
+            else
+            {
+                $('li.list-group-item.hidden:last').remove();
+            }
+            $.each(articles, function(i){
+                    var articleTag=$('<li class="list-group-item article">\
+                        <span class="date pull-right"></span>\
+                        <h4><a class="list-group-item-heading" target="_blank"></a></h4>\
+                        <p class="list-group-item-text"></p>\
+                    </li>');
+                    articleTag.data('article', this);
+                    articleTag.find('.date').text(new Date(this.date).relative('fr'));
+                    articleTag.find('h4 a').attr('href', this.link).text(this.title);
+                    articleTag.find('p').html(this.description);
+                    articleTag.appendTo('.agenda');
+                    if(new Date(this.date).hoursAgo()>0)
+                        $.getJSON('api/news/rss/readArticle/'+encodeURIComponent(this.id), function(){
+                            articleTag.hide('drop', function(){
+                                articleTag.remove();
+                            });
+                        });
+            });
+            $('<li class="list-group-item hidden"></li>').appendTo('.agenda');
+            if(from===0)
+                scrollTo($('.agenda .active + li:first'));
+            else
+                scrollTo($('.agenda .active'));
+        });
+    };
+    
+    if(typeof(require)=='undefined')
+        $('.swipe-screen > :not(.big)').remove();
+       
+
+    updateDateAndTime();
+    loadMore(0);
+
 </script>
