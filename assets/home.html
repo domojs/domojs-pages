@@ -353,6 +353,7 @@
     
 </style>
 <script src="/assets/news/js/sugar.js"></script>
+<script src="/assets/core/js/ua-parser.min.js"></script>
 <script>
     var hours={
             'Mairie Mulhouse':
@@ -418,11 +419,11 @@
             },
             'Cora Dornach':
             {
-                'monday':['8h30 à 20h30'],
-                'tuesday':['8h30 à 20h30'],
-                'wednesday':['8h30 à 20h30'],
-                'thursday':['8h30 à 20h30'],
-                'friday':['8h30 à 20h30'],
+                'monday':['8h30 à 21h00'],
+                'tuesday':['8h30 à 21h00'],
+                'wednesday':['8h30 à 21h00'],
+                'thursday':['8h30 à 21h00'],
+                'friday':['8h30 à 21h00'],
                 'saturday':['8h à 20h'],
             },
             'Lidl':
@@ -471,6 +472,53 @@
             cell.appendTo(row);
         })
         row.appendTo('.swipe-screen > div.hours > .table');
+    });
+    debugger;
+    var devices=io('/device');
+    var localDevices={};
+    
+    var register=function(device)
+    {
+        var declaredDevice=$.extend({}, device, { commands:$.map(device.commands, function(i, cmd){
+            return cmd;
+        })});
+        
+        
+        devices.emit('device', declaredDevice);
+    }
+    devices.on('connect', function(){
+        var commands={
+            'refresh':function(){
+                window.location.reload();
+            }
+        };
+        if(require)
+        {
+            var deviceName=require('os').hostname();
+            commands.on=function(){
+                require('child_process').spawn('sh', ['/home/pi/screen_on.sh']);
+            }
+            commands.off=function(){
+                require('child_process').spawn('sh', ['/home/pi/screen_off.sh']);
+            }
+        }
+        else
+        {
+            var uaParser=new UAParser();
+            var browser=uaParser.getBrowser();
+            var deviceName=browser.name+' '+browser.version;
+        }
+        localDevices[deviceName]={
+            type:'browser',
+            name:deviceName,
+            commands:commands
+        };
+        register(localDevices[deviceName]);
+    });
+    
+    devices.on('command', function(message)
+    {
+        localDevices[message.device].commands[message.command]();
     });
 
     socket.on('message', function(message)
@@ -539,11 +587,36 @@
     }
     
     var active=0;
+    var timeOut;
 
-    $(document).bindKey('F5', function(){
-        debugger;
-        socket.emit('refresh', 'home');
-    });
+    var moveOn=function(){
+	    var newActive=(active+1) % $('.swipe-screen > *').length;
+	    clearTimeout(timeOut);
+        scrollTo($('.swipe-screen > :nth-child('+(newActive+1)+')'), function(){
+            if(active===newActive)
+                return;
+            active=newActive;
+            if(active==0)
+                loadMore(0);
+        });
+    };
+    
+    var waitForNextScroll=function(){
+        timeOut=setTimeout(moveOn, 30000);
+    };
+    
+    $(document).bindKey('Num0', function(){
+        window.location.reload();
+    }).bindKey('Num1', function(){
+        $.getJSON('/api/device/nuit?cmd=on', function(){})
+    }).bindKey('Num2', function(){
+        $.getJSON('/api/device/Tous?cmd=down', function(){})
+    }).bindKey('Num5', function(){
+        $.getJSON('/api/device/Tous?cmd=stop', function(){})
+    }).bindKey('Num8', function(){
+        $.getJSON('/api/device/Tous?cmd=up', function(){})
+    }).bindKey('Enter', moveOn);
+    
     var scrollTo=function(element, callback)
     {
 		var min = element.position().top + element.outerHeight();
@@ -553,18 +626,10 @@
 			element.parents().animate({scrollTop:min - element.outerHeight()}, {complete:callback});
 		else
 			element.parents().animate({scrollTop:element.position().top - idealPosition}, {complete:callback});
+		waitForNextScroll();
     };
     
-    setInterval(function(){
-        var newActive=(active+1) % $('.swipe-screen > *').length;
-        scrollTo($('.swipe-screen > :nth-child('+(newActive+1)+')'), function(){
-            if(active===newActive)
-                return;
-            active=newActive;
-            if(active==0)
-                loadMore(0);
-        });
-    }, 30000);
+    waitForNextScroll();
     
     function updateDateAndTime(){
         var now=new Date();
@@ -591,7 +656,6 @@
         }, 60000);
     }, (60-now.getSeconds())*1000);
 
-    debugger;
     $('#modulePlaceHolder > li').addClass('list-group-item').appendTo('.agenda')
 
     var loadMore=function(from)
@@ -600,7 +664,6 @@
         {
             from=$('.agenda li').length-2;
         }
-        debugger;
         $.getJSON('/api/news/rss/unread?from='+from+'&tag=all&_='+Number(new Date()), function(articles){
             if(from===0)
             {
